@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>218180435 - Jem</title>
+    <style>
+        body{
+            margin: 0;
+            padding: 0;
+            background-color: rgb(245, 245, 221);
+        }
+        form{
+            padding: 10px;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: start;
+        }
+        #game{
+            margin-left: 10px;
+            display: flex;
+            flex-direction: column;
+            flex-wrap: wrap;
+            justify-content: start;
+        }
+        .row{
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: start;
+        }
+        .btn{
+            padding: 15px;
+            width: 50px;
+            height: 50px;
+            box-sizing: border-box;
+            text-align: center;
+            vertical-align: middle;
+            border: 1px solid darkgray;
+            background-color: lightgray;
+        }
+        .open{
+            background-color: gray;
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <form>
+        <label for="X">X:</label>
+        &nbsp;
+        <input type="text" name="x" id="x">
+        &nbsp;&nbsp;&nbsp;
+        <label for="Y">Y:</label>
+        &nbsp;
+        <input type="text" name="y" id="y">
+        &nbsp;&nbsp;&nbsp;
+        <select name="level" id="level">
+            <option>Easy</option>
+            <option>Medium</option>
+            <option>Hard</option>
+        </select>
+        &nbsp;&nbsp;
+        <button type="button" id="btnPlay" onclick="play()">Play</button>
+        &nbsp;&nbsp;
+        <button type="button" id="btnReset" onclick="resetGame()">Reset Game</button>
+    </form>
+    <div id="game">
+
+    </div>
+    <script>
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        var x;
+        var y;
+        var jml;
+        var jmlbom;
+        var peta;
+        var buka;
+        var arrbtn;
+        var main;
+
+        function resetGame(){
+            var txtX = document.getElementById("x");
+            var txtY = document.getElementById("y");
+            var inpLevel = document.getElementById("level");
+            txtX.value = '';
+            txtY.value = '';
+            x = 0;
+            y = 0;
+            jml = 0;
+            jmlbom = 0;
+            peta = [];
+            buka = [];
+            arrbtn = [];
+            main = false;
+            inpLevel.selectedIndex = 0;
+            var game = document.getElementById("game");
+            game.innerHTML = "";
+        }
+
+        function play(){
+            peta = [];
+            buka = [];
+            arrbtn = [];
+            main = true;
+            var txtX = document.getElementById("x");
+            var txtY = document.getElementById("y");
+            if(txtX.value != '' && txtY.value != ''){
+                x = txtX.value;
+                y = txtY.value;
+                if(x < 5 || y < 5 || x > 10 || y > 10){
+                    alert("Range Luas Papan adalah 5x5 - 10x10.")
+                    txtX.value = '';
+                    txtY.value = '';
+                    inpLevel.selectedIndex = 0;
+                }
+                else{
+                    var inpLevel = document.getElementById("level");
+                    var level = inpLevel.value;
+                    jml = x * y;
+                    if(level == 'Easy'){
+                        jmlbom = Math.floor(jml * 0.1);
+                    }
+                    else if(level == 'Medium'){
+                        jmlbom = Math.floor(jml * 0.3);
+                    }
+                    else if(level == 'Hard'){
+                        jmlbom = Math.floor(jml * 0.5);
+                    }
+                    for(var i = 0; i < y; i++){
+                        let row = [];
+                        let op = [];
+                        for(var j = 0; j < x; j++){
+                            row[j] = '';
+                            op[j] = 0;
+                        }
+                        peta[i] = row;
+                        buka[i] = op;
+                    }
+                    console.log(jmlbom);
+                    for(var i = 0; i < jmlbom; i++){
+                        let xb = Math.floor(Math.random() * x);
+                        let yb = Math.floor(Math.random() * y);
+                        while(peta[yb][xb] == '*'){
+                            xb = Math.floor(Math.random() * x);
+                            yb = Math.floor(Math.random() * y);
+                        }
+                        peta[yb][xb] = '*';
+                    }
+                    for(var i = 0 ; i < y; i++){
+                        for(var j = 0; j < x; j++){
+                            let ctrbom = 0;
+                            if(peta[i][j] != '*'){
+                                ctrbom = cekSekeliling(i,j);
+                                if(ctrbom == 0){
+                                    ctrbom = '';
+                                }
+                                peta[i][j] = ctrbom;
+                            }
+                        }   
+                    }
+                    console.log(peta);
+                    buatBoard();
+                    txtX.value = '';
+                    txtY.value = '';
+                    inpLevel.selectedIndex = 0;
+                }
+            }
+            else if(txtX.value == ''){
+                alert("X kosong!")
+            }
+            else if(txtY.value == ''){
+                alert("Y kosong!")
+            }
+        }
+
+        function cekSekeliling(i, j){
+            var i;
+            var ctrbom = 0;
+            if(i > 0){
+                if(j > 0){
+                    if(peta[i-1][j-1] == '*'){
+                        ctrbom++;
+                    }
+                }
+                if(peta[i-1][j] == '*'){
+                    ctrbom++;
+                }
+                if(j < x-1){
+                    if(peta[i-1][j+1] == '*'){
+                        ctrbom++;
+                    }
+                }
+            }
+            if(j > 0){
+                if(peta[i][j-1] == '*'){
+                    ctrbom++;
+                }
+            }
+            if(j < x-1){
+                if(peta[i][j+1] == '*'){
+                    ctrbom++;
+                }
+            }
+            if(i < y-1){
+                if(j > 0){
+                    if(peta[i+1][j-1] == '*'){
+                        ctrbom++;
+                    }
+                }
+                if(peta[i+1][j] == '*'){
+                    ctrbom++;
+                }
+                if(j < x-1){
+                    if(peta[i+1][j+1] == '*'){
+                        ctrbom++;
+                    }
+                }
+            }
+            return ctrbom;
+        }
+
+        function klik(row, col){
+            if(main){
+                
+                var btn = arrbtn[row][col];
+                if(btn.innerText != '' || btn.classList.contains('open')){
+                    return false;
+                }
+
+                if(peta[row][col] == '*'){
+                    gameOver();
+                }
+                else{
+                    arrbtn[row][col].classList.add('open');
+                    var teks = peta[row][col];
+                    arrbtn[row][col].innerText = teks;
+                    buka[row][col] = 1;
+                    if(teks == '1'){
+                        arrbtn[row][col].style.color = 'red';
+                    }
+                    else if(teks == '2'){
+                        arrbtn[row][col].style.color = 'orange';
+                    }
+                    else if(teks == '3'){
+                        arrbtn[row][col].style.color = 'yellow';
+                    }
+                    else if(teks == '4'){
+                        arrbtn[row][col].style.color = 'green';
+                    }
+                    else if(teks == '5'){
+                        arrbtn[row][col].style.color = 'blue';
+                    }
+                    else if(teks == '6'){
+                        arrbtn[row][col].style.color = 'indigo';
+                    }
+                    else if(teks == '7'){
+                        arrbtn[row][col].style.color = 'purple';
+                    }
+                    
+
+                    if(teks == ''){
+                        if(row-1 >= 0){
+                            if(peta[(row-1)][col] != '*'){
+                                klik(parseInt(row-1), parseInt(col));
+                            }
+                            if(col + 1 < x){
+                                if(peta[(row-1)][(col+1)] != '*'){
+                                    klik(parseInt(row-1), parseInt(col+1));
+                                }
+                            }
+                            if(col - 1 >= 0){
+                                if(peta[(row-1)][(col-1)] != '*'){
+                                    klik(parseInt(row-1), parseInt(col-1));
+                                }
+                            }
+                        }
+                        if((row+1) < y){
+                            if(peta[(row+1)][col] != '*'){
+                                klik(parseInt(row+1), parseInt(col));
+                            }
+                            if((col+1) < x){
+                                if(peta[(row+1)][(col+1)] != '*'){
+                                    klik(parseInt(row+1), parseInt(col+1));
+                                }
+                            }
+                            if((col-1) >= 0){
+                                if(peta[(row+1)][(col-1)] != '*'){
+                                    klik(parseInt(row+1), parseInt(col-1));
+                                }
+                            }
+                        }
+                        if((col+1) < x){
+                            if(peta[row][(col+1)] != '*'){
+                                klik(parseInt(row), parseInt(col+1));
+                            }
+                        }
+                        if(col-1 >= 0){
+                            if(peta[row][(col-1)] != '*'){
+                                klik(parseInt(row), parseInt(col-1));
+                            }
+                        }
+                    }
+                    cekMenang();
+                    return false;
+                }
+            }
+        }
+
+        function buatBoard(){
+            var game = document.getElementById("game");
+            game.innerHTML = "";
+            var ctr = 0;
+            for(var i = 0; i < y; i++){
+                let row = document.createElement("div");
+                var rowb = [];
+                row.setAttribute('id', 'row' + i);
+                row.setAttribute("class", "row");
+                game.appendChild(row);
+                for(var j = 0; j < x; j++){
+                    let button = document.createElement("div");
+                    button.setAttribute('id', 'btn' + ctr);
+                    button.setAttribute('class', 'btn');
+                    button.setAttribute('x', j);
+                    button.setAttribute('y', i);
+                    button.onmousedown = function(e){
+                        if(e.button == 0){
+                            if(button.innerText == ''){
+                                klik(parseInt(this.getAttribute('y')), parseInt(this.getAttribute('x')));
+                            }
+                        }
+                        else if(e.button == 2){
+                            if(button.innerText == '' && !button.classList.contains('open')){
+                                button.innerText = '?';
+                            }
+                            else if(button.innerText == '?'){
+                                button.innerText = '';
+                            }
+                        }
+                    };
+                    rowb.push(button);
+                    row.appendChild(button);
+                    ctr++;
+                }
+                arrbtn.push(rowb);
+            }
+            // console.log(arrbtn);
+        }
+
+        function tampilkanSemuaBoard(){
+            for(var i =0; i < jml; i++){
+                let btn = document.getElementById('btn' + i);
+                let teks = peta[btn.getAttribute('y')][btn.getAttribute('x')];
+                btn.innerText = teks;
+                if(teks == '1'){
+                    btn.style.color = 'red';
+                }
+                else if(teks == '2'){
+                    btn.style.color = 'orange';
+                }
+                else if(teks == '3'){
+                    btn.style.color = 'yellow';
+                }
+                else if(teks == '4'){
+                    btn.style.color = 'green';
+                }
+                else if(teks == '5'){
+                    btn.style.color = 'blue';
+                }
+                else if(teks == '6'){
+                    btn.style.color = 'indigo';
+                }
+                else if(teks == '7'){
+                    btn.style.color = 'purple';
+                }
+                if(!btn.classList.contains('open')){
+                    btn.classList.add('open');
+                }
+            }
+        }
+
+        function gameOver(){
+            alert('Game Over!');
+            tampilkanSemuaBoard();
+        }
+
+        function cekMenang(){
+            var ctr = 0;
+            for(var i = 0; i < y; i++){
+                for(var j = 0; j < x; j++){
+                    if(buka[i][j] == 1){
+                        ctr++;
+                    }
+                }
+            }
+            if(ctr == jml-jmlbom){
+                var again = confirm("Play Again?");
+                if(again == true){
+                    resetGame();
+                }
+            }
+        }
+    </script>
+</body>
+</html>
